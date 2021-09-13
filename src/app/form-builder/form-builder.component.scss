@@ -1,0 +1,11 @@
+.obj {
+    width: max-content;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 10px 10px;
+}
+.arr {
+    display: flex;
+    flex-direction: column;
+    width: max-content;
+}

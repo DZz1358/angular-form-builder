@@ -1,26 +1,90 @@
-<form (submit)="handleSubmit($event)">
-  <!-- The code below is an example! Feel free to remove it! -->
-  <div class="row">
-    <div class="six columns">
-      <label for="exampleEmailInput">Your email</label>
-      <input class="u-full-width" type="email" placeholder="test@mailbox.com" id="exampleEmailInput">
+<form (submit)="handleSubmit($event)" [formGroup]="studentForm" ngNativeValidate>
+
+
+  <div class="row" *ngFor="let item of schema.properties">
+    <div class="six columns" *ngIf="item.type == 'string'">
+      <label for="{{item.name}}"> {{item.label}} </label>
+      <input [placeholder]="item.name" class="u-full-width" type="text" id="{{item.name}}" [formControlName]="item.name"
+        required pattern="{{item.pattern}}">
     </div>
-    <div class="six columns">
-      <label for="exampleRecipientInput">Reason for contacting</label>
-      <select class="u-full-width" id="exampleRecipientInput">
-        <option value="Option 1">Questions</option>
-        <option value="Option 2">Admiration</option>
-        <option value="Option 3">Can I get your number?</option>
-      </select>
+
+    <div *ngIf="item.type == 'enum'" class="six columns">
+      <label for="">{{item.label}}</label>
+      <div>
+        <select name="{{ item.name }}" [formControlName]="item.name" [id]="item.name" class="u-full-width">
+          <option value="" selected disabled hidden>
+            Choose here
+          </option>
+          <option value="item.value" *ngFor="let item of item.options" [ngValue]="item.value">
+            {{ item.label }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+
+    <div *ngIf="item.type == 'number'" class="six columns">
+      <label for="">{{item.label}}</label>
+      <div>
+        <input type="text" [formControlName]="item.name" [placeholder]="item.name" required>
+      </div>
+    </div>
+
+
+    <div *ngIf="item.type == 'object'">
+      <div class="obj" formGroupName="{{item.name}}">
+        <label for="">{{item.label}}</label>
+        <div *ngFor="let item of item.properties">
+          <div *ngIf="item.type === 'string'">
+            <input type="text" [placeholder]="item.name" [formControlName]="item.name">
+          </div>
+          <div *ngIf="item.type === 'object'">
+            <div class="obj" formGroupName="{{item.name}}">
+              <label for="">{{item.label}}</label>
+              <div *ngFor="let item of item.properties">
+                <div *ngIf="item.type === 'string'">
+                  <input type="text" [placeholder]="item.name" [formControlName]="item.name">
+                </div>
+                <div *ngIf="item.type === 'object'">
+                  <div class="obj" formGroupName="{{item.name}}">
+                    <label for="">{{item.label}}</label>
+                    <div *ngFor="let item of item.properties">
+                      <div *ngIf="item.type === 'string'">
+                        <input type="text" [placeholder]="item.name" [formControlName]="item.name">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div *ngIf="item.type == 'array'">
+      <h4>{{item.label}}</h4>
+      <div class="arr">
+        <div *ngFor="let subItem of item.item.properties">
+          <div class="ten columns" [formArrayName]="item.name">
+            <label>{{subItem.label}}</label>
+            <input [formControlName]="subItem.name" type="text" [placeholder]="subItem.name" required>
+          </div>
+        </div>
+        <button type="button" (click)="addArrInput(item)">Add Item</button>
+      </div>
+    </div>
+
+
+    <div *ngIf="item.type == 'boolean'">
+      <label for="{{ item.name }}">{{ item.label }}</label>
+      <input type="checkbox" id="{{ item.name }}" [formControlName]="item.name" />
     </div>
   </div>
-  <label for="exampleMessage">Message</label>
-  <textarea class="u-full-width" placeholder="Hi Dave …" id="exampleMessage"></textarea>
-  <label class="example-send-yourself-copy">
-    <input type="checkbox">
-    <span class="label-body">Send a copy to yourself</span>
-  </label>
-  <!-- The code above is an example! Feel free to remove it! -->
 
+
+  <pre class="info">{{ this.studentForm.value | json }}</pre>
   <button type="submit">Submit</button>
 </form>
